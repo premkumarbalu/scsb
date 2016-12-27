@@ -97,13 +97,19 @@ public class SharedCollectionRestController {
     @ResponseBody
     public ResponseEntity submitCollection(@RequestBody String inputRecords) {
         RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity responseEntity;
         try {
             String response = restTemplate.postForObject(serverProtocol + scsbCircUrl + "sharedCollection/submitCollection", inputRecords, String.class);
-            ResponseEntity responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.OK);
+            if(response.equalsIgnoreCase(ReCAPConstants.INVALID_MARC_XML_FORMAT_MESSAGE) || response.equalsIgnoreCase(ReCAPConstants.INVALID_SCSB_XML_FORMAT_MESSAGE)
+                    || response.equalsIgnoreCase(ReCAPConstants.SUBMIT_COLLECTION_INTERNAL_ERROR)){
+                responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.BAD_REQUEST);
+            }else{
+                responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.OK);
+            }
             return responseEntity;
         } catch (Exception exception) {
             exception.printStackTrace();
-            ResponseEntity responseEntity = new ResponseEntity("Scsb Circ Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
+            responseEntity = new ResponseEntity("Scsb Circ Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
             return responseEntity;
         }
     }
