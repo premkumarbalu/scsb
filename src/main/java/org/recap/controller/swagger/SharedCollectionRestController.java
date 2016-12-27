@@ -29,6 +29,9 @@ public class SharedCollectionRestController {
     @Value("${scsb.solr.client.url}")
     String scsbSolrClientUrl;
 
+    @Value("${scsb.circ.url}")
+    String scsbCircUrl;
+
     @RequestMapping(value = "/itemAvailabilityStatus", method = RequestMethod.GET)
     @ApiOperation(value = "itemAvailabilityStatus",
             notes = "Item Availability Status", nickname = "itemAvailabilityStatus", position = 0)
@@ -83,6 +86,24 @@ public class SharedCollectionRestController {
             return responseEntity;
         } catch (Exception exception) {
             ResponseEntity responseEntity = new ResponseEntity("Scsb Solr Client Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
+            return responseEntity;
+        }
+    }
+
+    @RequestMapping(value = "/submitCollection", method = RequestMethod.POST)
+    @ApiOperation(value = "submitCollection",
+            notes = "Submit Collection", nickname = "submitCollection", position = 0)
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "OK")})
+    @ResponseBody
+    public ResponseEntity submitCollection(@RequestBody String inputRecords) {
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            String response = restTemplate.postForObject(serverProtocol + scsbCircUrl + "sharedCollection/submitCollection", inputRecords, String.class);
+            ResponseEntity responseEntity = new ResponseEntity(response, getHttpHeaders(), HttpStatus.OK);
+            return responseEntity;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            ResponseEntity responseEntity = new ResponseEntity("Scsb Circ Service is Unavailable.", getHttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
             return responseEntity;
         }
     }
