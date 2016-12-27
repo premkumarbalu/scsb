@@ -10,9 +10,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.Charset;
 import java.util.Date;
 
 /**
@@ -97,6 +99,8 @@ public class SharedCollectionRestController {
     @ResponseBody
     public ResponseEntity submitCollection(@RequestBody String inputRecords) {
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters()
+                .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
         ResponseEntity responseEntity;
         try {
             String response = restTemplate.postForObject(serverProtocol + scsbCircUrl + "sharedCollection/submitCollection", inputRecords, String.class);
